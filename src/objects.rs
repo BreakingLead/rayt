@@ -1,21 +1,6 @@
-use crate::maths::{Color, Point3};
+use crate::hit::{Front, HitRecord, Hittable};
+use crate::maths::Point3;
 use crate::ray::Ray;
-use crate::Vec3;
-
-pub enum Front {
-    Inward,
-    Outward,
-}
-
-pub struct HitRecord {
-    pub point: Vec3,
-    pub normal: Vec3,
-    pub front_face: Front,
-}
-
-pub trait Hittable {
-    fn hit_point(&self, ray: &Ray) -> Option<HitRecord>;
-}
 
 pub struct Sphere {
     radius: f64,
@@ -29,7 +14,7 @@ impl Sphere {
 }
 
 impl Hittable for Sphere {
-    fn hit_point(&self, ray: &Ray) -> Option<HitRecord> {
+    fn get_hit(&self, ray: &Ray) -> Option<HitRecord> {
         let oc = ray.origin - self.center;
         let a = ray.direction.length_squared();
         let half_b = oc * ray.direction;
@@ -45,7 +30,13 @@ impl Hittable for Sphere {
             Some(HitRecord {
                 point,
                 normal: outward_normal,
-                front_face: { if ray.direction * outward_normal < 0.0 {Front::Inward} else {Front::Outward} },
+                front_face: {
+                    if ray.direction * outward_normal < 0.0 {
+                        Front::Inward
+                    } else {
+                        Front::Outward
+                    }
+                },
             })
         }
     }

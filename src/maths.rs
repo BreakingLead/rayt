@@ -1,7 +1,6 @@
-use std::{
-    fmt::Display,
-    ops::{Add, Div, Mul, Sub},
-};
+use std::ops::{Add, Div, Mul, Sub};
+
+use image::Rgb;
 
 pub type Color = Vec3;
 pub type Point3 = Vec3;
@@ -38,18 +37,6 @@ impl Vec3 {
             y: -(self.x * other.z - other.x * self.z),
             z: self.x * other.y - other.x * self.y,
         }
-    }
-}
-
-impl Display for Vec3 {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(
-            f,
-            "{} {} {} ",
-            (self.x.clamp(0.0, 0.999) * 256.0) as i32,
-            (self.y.clamp(0.0, 0.999) * 256.0) as i32,
-            (self.z.clamp(0.0, 0.999) * 256.0) as i32
-        )
     }
 }
 
@@ -125,10 +112,18 @@ impl PartialEq for Vec3 {
     }
 }
 
+impl Into<Rgb<u8>> for Vec3 {
+    fn into(self) -> Rgb<u8> {
+        Rgb([
+            (self.x.clamp(0.0, 0.999) * 256.0) as u8,
+            (self.y.clamp(0.0, 0.999) * 256.0) as u8,
+            (self.z.clamp(0.0, 0.999) * 256.0) as u8,
+        ])
+    }
+}
+
 #[cfg(test)]
 mod tests {
     #[test]
-    fn normalize_test() {
-        let a = super::Vec3::new(1.0, 1.0, 1.0).normalize();
-    }
+    fn normalize_test() {}
 }

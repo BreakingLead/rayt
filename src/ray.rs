@@ -1,9 +1,5 @@
-use crate::maths::Color;
-use crate::maths::Point3;
-use crate::maths::Vec3;
-use crate::objects::Hittable;
-use crate::objects::Sphere;
-use crate::IMAGE_HEIGHT;
+use crate::hit::Hittable;
+use crate::maths::{Color, Point3, Vec3};
 
 #[derive(Clone, Copy)]
 pub struct Ray {
@@ -20,11 +16,10 @@ impl Ray {
         self.origin + self.direction * t
     }
 
-    pub fn result(&self, obj: &impl Hittable) -> Color {
-        match obj.hit_point(self) {
+    pub fn result<T: Hittable>(&self, obj: &T) -> Color {
+        match obj.get_hit(self) {
             Some(record) => {
                 let normal = record.normal;
-                let point = record.point;
 
                 Color::new(normal.x + 1.0, normal.y + 1.0, normal.z + 1.0) * 0.5
             }
