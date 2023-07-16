@@ -1,3 +1,5 @@
+use std::f64::INFINITY;
+
 use crate::hit::Hittable;
 use crate::maths::{Color, Point3, Vec3};
 
@@ -16,8 +18,8 @@ impl Ray {
         self.origin + self.direction * t
     }
 
-    pub fn result<T: Hittable>(&self, obj: &T) -> Color {
-        match obj.get_hit(self) {
+    pub fn get_pixel_color<T: Hittable>(&self, obj: &T) -> Color {
+        match obj.get_hit_record(self, 0.0, INFINITY) {
             Some(record) => {
                 let normal = record.normal;
 

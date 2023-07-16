@@ -1,3 +1,5 @@
+use std::rc::Rc;
+
 use crate::{maths::Vec3, ray::Ray};
 
 pub enum Front {
@@ -9,8 +11,44 @@ pub struct HitRecord {
     pub point: Vec3,
     pub normal: Vec3,
     pub front_face: Front,
+    pub t: f64,
 }
 
 pub trait Hittable {
-    fn get_hit(&self, ray: &Ray) -> Option<HitRecord>;
+    fn get_hit_record(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord>;
+}
+
+pub struct HittableList {
+    objects: Vec<Rc<dyn Hittable>>,
+}
+
+impl HittableList {
+    pub fn new() -> Self {
+        Self { objects: vec![] }
+    }
+
+    pub fn clear(&mut self) {
+        self.objects.clear();
+    }
+
+    pub fn add(&mut self, obj: Rc<dyn Hittable>) {
+        self.objects.push(obj)
+    }
+}
+
+impl Hittable for HittableList {
+    fn get_hit_record(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
+        let mut closest = t_max;
+        let mut result = None;
+        for object in &self.objects {
+            match object.get_hit_record(ray, t_min, closest) {
+                Some(rec) => {
+                    closest = rec.t;
+                    result = Some(rec);
+                }
+                None => continue,
+            }
+        }
+        result
+    }
 }

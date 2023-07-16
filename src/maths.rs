@@ -5,7 +5,7 @@ use image::Rgb;
 pub type Color = Vec3;
 pub type Point3 = Vec3;
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub struct Vec3 {
     pub x: f64,
     pub y: f64,
@@ -37,6 +37,18 @@ impl Vec3 {
             y: -(self.x * other.z - other.x * self.z),
             z: self.x * other.y - other.x * self.y,
         }
+    }
+}
+
+impl From<[f64; 3]> for Vec3 {
+    fn from(value: [f64; 3]) -> Self {
+        Self::new(value[0], value[1], value[2])
+    }
+}
+
+impl From<(f64, f64, f64)> for Vec3 {
+    fn from(value: (f64, f64, f64)) -> Self {
+        Self::new(value.0, value.1, value.2)
     }
 }
 
@@ -115,9 +127,9 @@ impl PartialEq for Vec3 {
 impl Into<Rgb<u8>> for Vec3 {
     fn into(self) -> Rgb<u8> {
         Rgb([
-            (self.x.clamp(0.0, 0.999) * 256.0) as u8,
-            (self.y.clamp(0.0, 0.999) * 256.0) as u8,
-            (self.z.clamp(0.0, 0.999) * 256.0) as u8,
+            (self.x.clamp(0.0, 0.9999) * 256.0) as u8,
+            (self.y.clamp(0.0, 0.9999) * 256.0) as u8,
+            (self.z.clamp(0.0, 0.9999) * 256.0) as u8,
         ])
     }
 }

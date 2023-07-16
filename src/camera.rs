@@ -4,6 +4,7 @@ use crate::{
     IMAGE_HEIGHT, IMAGE_WIDTH,
 };
 
+#[derive(Debug)]
 pub struct Camera {
     origin: Point3,
     lower_left_corner: Vec3,
@@ -26,18 +27,22 @@ impl Camera {
         let lower_left_corner =
             origin - horizontal / 2.0 - vertical / 2.0 - Vec3::new(0.0, 0.0, focal_length);
 
-        Self {
+        let res = Self {
             origin,
             lower_left_corner,
             horizontal,
             vertical,
-        }
+        };
+
+        res
     }
 
-    pub fn get_ray(&self, x_ratio: f64, y_ratio: f64) -> Ray {
+    pub fn get_ray(&self, width: u32, height: u32, x: u32, y: u32) -> Ray {
         Ray::new(
             self.origin,
-            self.lower_left_corner + self.horizontal * x_ratio + self.vertical * y_ratio
+            self.lower_left_corner
+                + self.horizontal * (x as f64 / (width - 1) as f64)
+                + self.vertical * (y as f64 / (height - 1) as f64)
                 - self.origin,
         )
     }
