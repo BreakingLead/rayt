@@ -37,12 +37,12 @@ impl Camera {
         res
     }
 
-    pub fn get_ray(&self, width: u32, height: u32, x: u32, y: u32) -> Ray {
+    pub fn get_ray(&self, width: u32, height: u32, x: f64, y: f64) -> Ray {
+        let x_ratio = x as f64 / (width - 1) as f64;
+        let y_ratio = y as f64 / (height - 1) as f64;
         Ray::new(
             self.origin,
-            self.lower_left_corner
-                + self.horizontal * (x as f64 / (width - 1) as f64)
-                + self.vertical * (y as f64 / (height - 1) as f64)
+            self.lower_left_corner + self.horizontal * x_ratio + self.vertical * y_ratio
                 - self.origin,
         )
     }

@@ -1,6 +1,7 @@
 use std::ops::{Add, Div, Mul, Sub};
 
 use image::Rgb;
+use rand::{random, thread_rng, Rng};
 
 pub type Color = Vec3;
 pub type Point3 = Vec3;
@@ -15,6 +16,25 @@ pub struct Vec3 {
 impl Vec3 {
     pub fn new(x: f64, y: f64, z: f64) -> Self {
         Self { x, y, z }
+    }
+
+    pub fn new_random(min: f64, max: f64) -> Self {
+        let mut rng = thread_rng();
+        Self::new(
+            rng.gen_range(min..max),
+            rng.gen_range(min..max),
+            rng.gen_range(min..max),
+        )
+    }
+
+    pub fn new_random_in_unit_circle() -> Self {
+        loop {
+            let n = Self::new_random(-1.0, 1.0);
+            if n.length_squared() >= 1.0 {
+                continue;
+            };
+            return n;
+        }
     }
 }
 
@@ -107,14 +127,10 @@ impl Div<f64> for Vec3 {
 }
 
 impl Div for Vec3 {
-    type Output = Self;
+    type Output = f64;
 
-    fn div(self, rhs: Self) -> Self {
-        Self {
-            x: self.x / rhs.x,
-            y: self.y / rhs.y,
-            z: self.z / rhs.z,
-        }
+    fn div(self, rhs: Self) -> f64 {
+        self.x / rhs.x + self.y / rhs.y + self.z / rhs.z
     }
 }
 
