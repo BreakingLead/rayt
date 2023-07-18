@@ -50,22 +50,22 @@ impl Hittable for Sphere {
     }
 }
 
-pub struct Ground {
-    y: f64,
+pub struct Plane {
+    origin: Point3,
+    x_axis: Vec3,
+    y_axis: Vec3,
 }
 
-impl Ground {
-    pub fn new(y: f64) -> Self {
-        Self { y }
-    }
-}
-
-impl Hittable for Ground {
-    fn get_hit_record(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
-        if ray.direction * Vec3::new(0.0, -1.0, 0.0) <= 0.0 {
-            None
-        } else {
-            todo!()
+impl Plane {
+    pub fn new(origin: Point3, x_axis: Vec3, y_axis: Vec3) -> Self {
+        Self {
+            origin,
+            x_axis,
+            y_axis,
         }
     }
+}
+
+impl Hittable for Plane {
+    fn get_hit_record(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {}
 }

@@ -7,7 +7,7 @@ use rand::{random, Rng};
 use crate::{
     hit::HittableList,
     maths::{Color, Vec3},
-    objects::{Ground, Sphere},
+    objects::{Plane, Sphere},
 };
 
 mod camera;
