@@ -51,21 +51,43 @@ impl Hittable for Sphere {
 }
 
 pub struct Plane {
-    origin: Point3,
-    x_axis: Vec3,
-    y_axis: Vec3,
+    a: Point3,
+    b: Point3,
+    c: Point3,
 }
 
 impl Plane {
-    pub fn new(origin: Point3, x_axis: Vec3, y_axis: Vec3) -> Self {
-        Self {
-            origin,
-            x_axis,
-            y_axis,
-        }
+    pub fn new(a: Point3, b: Point3, c: Point3) -> Self {
+        Self { a, b, c }
+    }
+
+    pub fn origin(&self) -> Point3 {
+        self.a
+    }
+
+    pub fn edge_x(&self) -> Vec3 {
+        self.b - self.a
+    }
+
+    pub fn edge_y(&self) -> Vec3 {
+        self.c - self.a
     }
 }
 
 impl Hittable for Plane {
-    fn get_hit_record(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {}
+    fn get_hit_record(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
+        // Known
+        let o = Point3::origin();
+        let a = self.origin();
+        let a_b = self.edge_x();
+        let a_c = self.edge_y();
+
+        // Solve
+        let t = 0;
+        let d = Vec3::origin();
+        
+        // We know 
+
+
+    }
 }

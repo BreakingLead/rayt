@@ -18,6 +18,14 @@ impl Vec3 {
         Self { x, y, z }
     }
 
+    pub fn origin() -> Self {
+        Self {
+            x: 0.0,
+            y: 0.0,
+            z: 0.0,
+        }
+    }
+
     pub fn new_random(min: f64, max: f64) -> Self {
         let mut rng = thread_rng();
         Self::new(
