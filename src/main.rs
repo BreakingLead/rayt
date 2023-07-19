@@ -2,13 +2,9 @@ use std::rc::Rc;
 
 use camera::Camera;
 use image::RgbImage;
-use rand::{random, Rng};
+use rand::Rng;
 
-use crate::{
-    hit::HittableList,
-    maths::{Color, Vec3},
-    objects::{Plane, Sphere},
-};
+use crate::{hit::HittableList, maths::Color, objects::Sphere};
 
 mod camera;
 mod hit;
@@ -17,9 +13,9 @@ mod objects;
 mod ray;
 mod utils;
 
-const IMAGE_WIDTH: u32 = 200;
-const IMAGE_HEIGHT: u32 = 150;
-const SAMPLES_PER_PIXEL: u32 = 15;
+const IMAGE_WIDTH: u32 = 800;
+const IMAGE_HEIGHT: u32 = 600;
+const SAMPLES_PER_PIXEL: u32 = 30;
 
 fn main() {
     // Image
@@ -39,28 +35,28 @@ fn main() {
     world.add(Rc::new(Sphere::new([0.0, 2.0, -2.0].into(), 1.0)));
 
     // Render
+    let mut rng = rand::thread_rng();
     // for (x, y, pixel) in img.enumerate_pixels_mut() {
     //     *pixel = ray.get_pixel_color(&world).into();
     // }
-    let mut rng = rand::thread_rng();
-    for y in (0..img.height()).rev() {
-        for x in 0..img.width() {
-            let mut pixel_color = Color::new(0.0, 0.0, 0.0);
+    for (x, y, pixel) in img.enumerate_pixels_mut() {
+        let y = IMAGE_HEIGHT - y - 1;
 
-            for i in (0..SAMPLES_PER_PIXEL) {
-                let ray = camera.get_ray(
-                    img.width(),
-                    img.height(),
-                    x as f64 + rng.gen::<f64>(),
-                    y as f64 + rng.gen::<f64>(),
-                );
+        let mut pixel_color = Color::new(0.0, 0.0, 0.0);
 
-                pixel_color = pixel_color + ray.get_pixel_color(&world);
-            }
-            pixel_color = pixel_color / SAMPLES_PER_PIXEL as f64;
+        for i in 0..SAMPLES_PER_PIXEL {
+            let ray = camera.get_ray(
+                IMAGE_WIDTH,
+                IMAGE_HEIGHT,
+                x as f64 + rng.gen::<f64>(),
+                y as f64 + rng.gen::<f64>(),
+            );
 
-            img.put_pixel(x, img.height() - y - 1, pixel_color.into());
+            pixel_color = pixel_color + ray.get_pixel_color(&world);
         }
+        pixel_color = pixel_color / SAMPLES_PER_PIXEL as f64;
+
+        *pixel = pixel_color.into();
     }
     println!("Done");
     img.save("test2.png").unwrap();

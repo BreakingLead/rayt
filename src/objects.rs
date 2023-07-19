@@ -85,9 +85,9 @@ impl Hittable for Plane {
         // Solve
         let t = 0;
         let d = Vec3::origin();
-        
-        // We know 
 
+        // We know
 
+        todo!()
     }
 }
