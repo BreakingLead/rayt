@@ -5,11 +5,7 @@ use camera::Camera;
 use image::RgbImage;
 use rand::Rng;
 
-use crate::{
-    hit::HittableList,
-    maths::Color,
-    objects::{Plane, Sphere},
-};
+use crate::{hit::HittableList, maths::Color, objects::Plane, objects::Sphere};
 
 mod camera;
 mod hit;
