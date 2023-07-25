@@ -76,7 +76,7 @@ impl Plane {
 
 impl Hittable for Plane {
     fn get_hit_record(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
-        //use the plane equation ax + by + cz + d = 0, where (A, B, C) is the normal vector of the plane.
+        //use the plane equation ax + by + cz + d = 0, where (a, b, c) is the normal vector of the plane.
         let mut norm = self.edge_x.cross(&self.edge_y).normalize();
         
         //solve for d
@@ -110,6 +110,8 @@ impl Hittable for Plane {
         let point_vec_2: Point3 = intersect_point - vertice_2;
         let point_vec_3: Point3 = intersect_point - vertice_3;
         let point_vec_4: Point3 = intersect_point - vertice_4;
+
+        //calculate the cross products of the edge vectors and the point vectors
         let result_1 = edge_1.cross(&point_vec_1).normalize();
         let result_2 = edge_2.cross(&point_vec_2).normalize();
         let result_3 = edge_3.cross(&point_vec_3).normalize();
@@ -118,7 +120,7 @@ impl Hittable for Plane {
         //collect results into an array
         let results = [result_1, result_2, result_3, result_4];
         
-        //identify whether the four cross results are likely equal to the normal vector
+        //identify whether the four cross products are likely equal to the normal vector
         for result in results {
             if (result - norm).length() > 0.001 {
                 return None;
