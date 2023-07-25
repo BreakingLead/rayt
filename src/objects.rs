@@ -51,43 +51,90 @@ impl Hittable for Sphere {
 }
 
 pub struct Plane {
-    a: Point3,
-    b: Point3,
-    c: Point3,
+    origin: Point3,
+    edge_x: Vec3,
+    edge_y: Vec3,
 }
 
 impl Plane {
-    pub fn new(a: Point3, b: Point3, c: Point3) -> Self {
-        Self { a, b, c }
+    pub fn new(origin: Point3, edge_x: Vec3, edge_y: Vec3) -> Self {
+        Self { origin, edge_x, edge_y }
     }
 
     pub fn origin(&self) -> Point3 {
-        self.a
+        self.origin
     }
 
     pub fn edge_x(&self) -> Vec3 {
-        self.b - self.a
+        self.edge_x
     }
 
     pub fn edge_y(&self) -> Vec3 {
-        self.c - self.a
+        self.edge_y
     }
 }
 
 impl Hittable for Plane {
     fn get_hit_record(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
-        // Known
-        let o = Point3::origin();
-        let a = self.origin();
-        let a_b = self.edge_x();
-        let a_c = self.edge_y();
+        //use the plane equation ax + by + cz + d = 0, where (A, B, C) is the normal vector of the plane.
+        let mut norm = self.edge_x.cross(&self.edge_y).normalize();
+        
+        //solve for d
+        let d = norm * self.origin * (-1.0);
 
-        // Solve
-        let t = 0;
-        let d = Vec3::origin();
+        //calculate k in line parametric equation P_vec = O_vec + k * dir_vec
+        let k = - (norm*ray.origin + d) / (norm*ray.direction);
 
-        // We know
+        //identify whether k is in the acceptable range
+        if k < t_min || k > t_max {
+            return None;
+        }
 
-        todo!()
+        //get intersection point
+        let intersect_point = ray.origin + ray.direction * k;
+
+        //calculate 4 vertices of the plane
+        let vertice_1: Point3 = self.origin;
+        let vertice_2: Point3 = self.origin + self.edge_x;
+        let vertice_3: Point3 = self.origin + self.edge_x + self.edge_y;
+        let vertice_4: Point3 = self.origin + self.edge_y;
+        
+        //calculate edge vector
+        let edge_1: Vec3 = vertice_2 - vertice_1;
+        let edge_2: Vec3 = vertice_3 - vertice_2;
+        let edge_3: Vec3 = vertice_4 - vertice_3;
+        let edge_4: Vec3 = vertice_1 - vertice_4;
+        
+        //calculate interesetion point vector relative to the four vertices
+        let point_vec_1: Point3 = intersect_point - vertice_1;
+        let point_vec_2: Point3 = intersect_point - vertice_2;
+        let point_vec_3: Point3 = intersect_point - vertice_3;
+        let point_vec_4: Point3 = intersect_point - vertice_4;
+        let result_1 = edge_1.cross(&point_vec_1).normalize();
+        let result_2 = edge_2.cross(&point_vec_2).normalize();
+        let result_3 = edge_3.cross(&point_vec_3).normalize();
+        let result_4 = edge_4.cross(&point_vec_4).normalize();
+
+        //collect results into an array
+        let results = [result_1, result_2, result_3, result_4];
+        
+        //identify whether the four cross results are likely equal to the normal vector
+        for result in results {
+            if (result - norm).length() > 0.001 {
+                return None;
+            }
+        }
+
+        //flip the normal vector if necessary
+        if ray.direction * norm > 0.0 {
+            norm = norm * (-1.0);
+        }
+
+        return Some(HitRecord { 
+            point: intersect_point, 
+            normal: norm, 
+            front_face: Front::Outward, 
+            t: k,
+        });
     }
 }

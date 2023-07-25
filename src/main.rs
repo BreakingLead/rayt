@@ -1,10 +1,11 @@
 use std::rc::Rc;
+use std::time::SystemTime;
 
 use camera::Camera;
 use image::RgbImage;
 use rand::Rng;
 
-use crate::{hit::HittableList, maths::Color, objects::Sphere};
+use crate::{hit::HittableList, maths::Color, objects::{Sphere, Plane}};
 
 mod camera;
 mod hit;
@@ -13,9 +14,9 @@ mod objects;
 mod ray;
 mod utils;
 
-const IMAGE_WIDTH: u32 = 200;
-const IMAGE_HEIGHT: u32 = 150;
-const SAMPLES_PER_PIXEL: u32 = 7;
+const IMAGE_WIDTH: u32 = 800;
+const IMAGE_HEIGHT: u32 = 600;
+const SAMPLES_PER_PIXEL: u32 = 30;
 
 fn main() {
     // Image
@@ -33,8 +34,13 @@ fn main() {
     world.add(Rc::new(Sphere::new([-6.0, 1.0, -10.0].into(), 3.0)));
     world.add(Rc::new(Sphere::new([-4.5, 2.5, -10.0].into(), 3.0)));
     world.add(Rc::new(Sphere::new([0.0, 2.0, -2.0].into(), 1.0)));
+    world.add(Rc::new(Plane::new([-8.0, -2.0, -5.0].into(), 
+                                    [16.0, -1.0, 0.0].into(), 
+                                    [0.0, 8.0, -10.0].into())));
 
     // Render
+    println!("Start Rendering...");
+    let start_t = SystemTime::now();
     let mut rng = rand::thread_rng();
     // for (x, y, pixel) in img.enumerate_pixels_mut() {
     //     *pixel = ray.get_pixel_color(&world).into();
@@ -58,6 +64,7 @@ fn main() {
 
         *pixel = pixel_color.into();
     }
-    println!("Done");
-    img.save("test2.png").unwrap();
+    let render_time = start_t.elapsed().unwrap().as_millis() as f64 / 1000.0;
+    println!("Elasped {} sec.", render_time);
+    img.save("test.png").unwrap();
 }
