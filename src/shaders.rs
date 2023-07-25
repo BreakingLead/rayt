@@ -7,6 +7,7 @@ pub enum ShaderType {
 
 impl Renderer {
     pub fn shader_phong(&self, record: HitRecord) -> Color {
-        todo!()
+        // TODO: shader
+        Color::new(1.0, 1.0, 1.0)
     }
 }
