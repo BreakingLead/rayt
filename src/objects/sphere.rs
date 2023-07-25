@@ -1,5 +1,7 @@
+use serde::Deserialize;
+
 use crate::hit::{Front, HitRecord, Hittable};
-use crate::maths::{Point3, Vec3, Color};
+use crate::maths::{Color, Point3, Vec3};
 use crate::ray::Ray;
 
 pub struct Sphere {

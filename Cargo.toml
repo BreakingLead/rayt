@@ -13,5 +13,5 @@ indicatif = "0.17.5"
 minifb = "0.24.0"
 rand = "0.8.5"
 rayon = "1.7.0"
-serde = "1.0.175"
+serde = { version = "1.0.175", features = ["derive"] }
 toml = "0.7.6"

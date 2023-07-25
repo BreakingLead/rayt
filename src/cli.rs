@@ -34,11 +34,10 @@ use std::{fs, path::Path, rc::Rc};
 
 use crate::{
     camera::*, const_vars::ConstContext, hit::HittableList, light::*, objects::*, renderer::*,
-    shaders::Phong,
 };
 
 pub fn init() -> ConstContext {
-    // let config = fs::read_to_string(Path::new("../config.toml")).unwrap();
+    let config = fs::read_to_string(Path::new("config.toml")).unwrap();
 
     ConstContext {
         samples_per_pixel: 10,
@@ -105,7 +104,7 @@ pub fn draw(ctx: ConstContext) {
     )));
 
     //render
-    let renderer = Renderer::new(world, light_group, camera, Box::new(Phong::new()), ctx);
+    let renderer = Renderer::new(world, light_group, camera, ctx);
     let img = renderer.render();
 
     //output image
