@@ -27,14 +27,45 @@
 
 //     if let Some(path) = cli.config.as_deref() {
 //     }
-    
 
 // }
 
-fn init() {
+use std::rc::Rc;
 
+use crate::{
+    camera::*, const_vars::ConstContext, hit::HittableList, light::*, objects::*, renderer::*,
+};
+
+pub fn init() -> ConstContext {
+    ConstContext {
+        samples_per_pixel: 10,
+    }
 }
 
-fn draw() {
+pub fn draw(ctx: ConstContext) {
+    //create camera
+    let camera = Camera::new(400, 300);
 
+    //create light
+    let light = Light::new([-8.0, 8.0, -6.0].into(), 1.0, [1.0, 1.0, 1.0].into());
+
+    //create world with objects
+    let mut world = HittableList::new();
+    world.add(Rc::new(Sphere::new([3.0, 1.0, -10.0].into(), 1.0)));
+    world.add(Rc::new(Sphere::new([-3.0, 1.0, -10.0].into(), 3.0)));
+    world.add(Rc::new(Sphere::new([-6.0, 1.0, -10.0].into(), 3.0)));
+    world.add(Rc::new(Sphere::new([-4.5, -2.5, -10.0].into(), 3.0)));
+    world.add(Rc::new(Sphere::new([0.0, 2.0, -2.0].into(), 1.0)));
+    world.add(Rc::new(Plane::new(
+        [-8.0, -2.0, -5.0].into(),
+        [16.0, -1.0, 0.0].into(),
+        [0.0, 8.0, -10.0].into(),
+    )));
+
+    //render
+    let renderer = Renderer::new(world, light, camera, Shader::PathTracing, ctx);
+    let img = renderer.render(true);
+
+    //output image
+    img.save("test.png").unwrap();
 }

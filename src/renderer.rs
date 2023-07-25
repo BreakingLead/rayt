@@ -3,7 +3,7 @@ use rand::Rng;
 use std::f64::INFINITY;
 use std::time::SystemTime;
 
-use crate::SAMPLES_PER_PIXEL;
+use crate::const_vars::ConstContext;
 use crate::{
     camera::Camera,
     hit::{Hittable, HittableList},
@@ -24,23 +24,30 @@ pub struct Renderer {
     pub light: Light,
     pub camera: Camera,
     pub shader: Shader,
+    pub ctx: ConstContext,
 }
 
 impl Renderer {
-    pub fn new(world: HittableList, light: Light, camera: Camera, shader: Shader) -> Self {
-        let res = Self {
+    pub fn new(
+        world: HittableList,
+        light: Light,
+        camera: Camera,
+        shader: Shader,
+        ctx: ConstContext,
+    ) -> Self {
+        Self {
             world,
             light,
             camera,
             shader,
-        };
-
-        res
+            ctx,
+        }
     }
 
     fn get_pixel_color(&self, ray: &Ray) -> Color {
         match self.world.get_hit_record(ray, 0.0, INFINITY) {
             Some(record) => {
+                // TODO: Shader for this place
                 let normal = record.normal;
 
                 Color::new(normal.x + 1.0, normal.y + 1.0, normal.z + 1.0) * 0.5
@@ -48,36 +55,37 @@ impl Renderer {
             None => {
                 let y_ratio = (ray.direction.normalize().y + 1.0) / 2.0;
 
+                // Linear interpolation method
                 Color::new(1.0, 1.0, 1.0) * (1.0 - y_ratio) + Color::new(0.5, 0.5, 0.7) * y_ratio
             }
         }
     }
 
     pub fn render(&self, output: bool) -> ImageBuffer<Rgb<u8>, Vec<u8>> {
-        let mut img = RgbImage::new(IMAGE_WIDTH, IMAGE_HEIGHT);
+        let mut img = RgbImage::new(self.camera.image_width, self.camera.image_height);
         let start_t = SystemTime::now();
         let mut rng = rand::thread_rng();
 
         for (x, y, pixel) in img.enumerate_pixels_mut() {
             if output {
-                //todo: output rendering time & process
+                // TODO: output rendering time & process
             }
 
-            let y = IMAGE_HEIGHT - y - 1;
+            let y = self.camera.image_height as u32 - y - 1;
 
             let mut pixel_color = Color::new(0.0, 0.0, 0.0);
 
-            for i in 0..SAMPLES_PER_PIXEL {
+            for i in 0..self.ctx.samples_per_pixel {
                 let ray = self.camera.get_ray(
-                    IMAGE_WIDTH,
-                    IMAGE_HEIGHT,
+                    self.camera.image_width,
+                    self.camera.image_height,
                     x as f64 + rng.gen::<f64>(),
                     y as f64 + rng.gen::<f64>(),
                 );
 
                 pixel_color = pixel_color + self.get_pixel_color(&ray);
             }
-            pixel_color = pixel_color / SAMPLES_PER_PIXEL as f64;
+            pixel_color = pixel_color / self.ctx.samples_per_pixel as f64;
 
             *pixel = pixel_color.into();
         }

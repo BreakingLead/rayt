@@ -1,4 +1,4 @@
-use crate::maths::{Point3, Vec3, Color};
+use crate::maths::{Color, Point3};
 
 pub struct Light {
     pub origin: Point3,
@@ -8,12 +8,10 @@ pub struct Light {
 
 impl Light {
     pub fn new(origin: Point3, intensity: f64, color: Color) -> Self {
-        let res = Self {
+        Self {
             origin,
             intensity,
             color,
-        };
-
-        res
+        }
     }
 }

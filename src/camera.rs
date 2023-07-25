@@ -1,13 +1,12 @@
 use crate::{
     maths::{Point3, Vec3},
     ray::Ray,
-    IMAGE_HEIGHT, IMAGE_WIDTH,
 };
 
 #[derive(Debug)]
 pub struct Camera {
-    image_width: usize,
-    image_height: usize,
+    pub image_width: u32,
+    pub image_height: u32,
     origin: Point3,
     lower_left_corner: Vec3,
     horizontal: Vec3,
@@ -15,8 +14,8 @@ pub struct Camera {
 }
 
 impl Camera {
-    pub fn new(image_width: usize, image_height: usize) -> Self {
-        let aspect_ratio: f64 = IMAGE_WIDTH as f64 / IMAGE_HEIGHT as f64;
+    pub fn new(image_width: u32, image_height: u32) -> Self {
+        let aspect_ratio: f64 = image_width as f64 / image_height as f64;
 
         let viewport_height: f64 = 2.0;
         let viewport_width: f64 = viewport_height * aspect_ratio;
@@ -30,6 +29,8 @@ impl Camera {
             origin - horizontal / 2.0 - vertical / 2.0 - Vec3::new(0.0, 0.0, focal_length);
 
         let res = Self {
+            image_width,
+            image_height,
             origin,
             lower_left_corner,
             horizontal,
