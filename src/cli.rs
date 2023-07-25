@@ -46,6 +46,7 @@ pub struct Config {
     width: u32,
     height: u32,
     samples: u32,
+    max_depth: u32,
     #[serde(rename = "Sphere")]
     spheres: Vec<SerializationSphere>,
     #[serde(rename = "Plane")]
@@ -58,6 +59,7 @@ pub fn init() -> ConstContext {
 
     ConstContext {
         samples_per_pixel: config.samples,
+        max_depth: config.max_depth,
         output: true,
         config,
     }

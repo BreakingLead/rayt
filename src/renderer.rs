@@ -9,7 +9,7 @@ use crate::{
     const_vars::ConstContext,
     hit::{HitRecord, Hittable, HittableList},
     light::LightGroup,
-    maths::Color,
+    maths::{Color, Point3, Vec3},
     ray::Ray,
     shaders::ShaderType,
 };
@@ -39,9 +39,20 @@ impl Renderer {
         }
     }
 
-    fn get_pixel_color(&self, ray: &Ray) -> Color {
+    fn get_pixel_color(&self, ray: &Ray, depth: i32) -> Color {
+        if depth <= 0 {
+            return (0.0, 0.0, 0.0).into();
+        }
+
         match self.world.get_hit_record(ray, 0.0, INFINITY) {
-            Some(record) => self.get_color_from_record(record, &self.shader_type),
+            Some(record) => {
+                let target: Point3 =
+                    record.point + record.normal + Vec3::new_random_in_unit_circle();
+
+                self.get_pixel_color(&Ray::new(record.point, target - record.point), depth - 1)
+                    * 0.5
+                // self.get_color_from_record(record, &self.shader_type);
+            }
             None => {
                 Color::new(1.0, 1.0, 1.0) * (1.0 - ((ray.direction.normalize().y + 1.0) / 2.0))
                     + Color::new(0.5, 0.5, 0.7) * ((ray.direction.normalize().y + 1.0) / 2.0)
@@ -77,7 +88,7 @@ impl Renderer {
                     y as f64 + rng.gen::<f64>(),
                 );
 
-                pixel_color = pixel_color + self.get_pixel_color(&ray);
+                pixel_color = pixel_color + self.get_pixel_color(&ray, self.ctx.max_depth as i32);
             }
             pixel_color = pixel_color / self.ctx.samples_per_pixel as f64;
 
