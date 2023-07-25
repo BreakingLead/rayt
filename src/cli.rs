@@ -43,6 +43,9 @@ use crate::{
 use crate::objects::sphere::SerializationSphere;
 #[derive(Deserialize)]
 pub struct Config {
+    width: u32,
+    height: u32,
+    samples: u32,
     #[serde(rename = "Sphere")]
     spheres: Vec<SerializationSphere>,
     #[serde(rename = "Plane")]
@@ -54,7 +57,7 @@ pub fn init() -> ConstContext {
     let config: Config = toml::from_str(&config).unwrap();
 
     ConstContext {
-        samples_per_pixel: 10,
+        samples_per_pixel: config.samples,
         output: true,
         config,
     }
@@ -62,7 +65,7 @@ pub fn init() -> ConstContext {
 
 pub fn draw(ctx: ConstContext) {
     //create camera
-    let camera = Camera::new(400, 300);
+    let camera = Camera::new(ctx.config.width, ctx.config.height);
 
     //create light group
     let mut light_group = LightGroup::new();
