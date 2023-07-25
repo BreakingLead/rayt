@@ -13,9 +13,9 @@ mod objects;
 mod ray;
 mod utils;
 
-const IMAGE_WIDTH: u32 = 800;
-const IMAGE_HEIGHT: u32 = 600;
-const SAMPLES_PER_PIXEL: u32 = 30;
+const IMAGE_WIDTH: u32 = 200;
+const IMAGE_HEIGHT: u32 = 150;
+const SAMPLES_PER_PIXEL: u32 = 7;
 
 fn main() {
     // Image
