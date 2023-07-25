@@ -41,7 +41,7 @@ impl Renderer {
 
     fn get_pixel_color(&self, ray: &Ray) -> Color {
         match self.world.get_hit_record(ray, 0.0, INFINITY) {
-            Some(record) => self.get_color_from_record(record, self.shader_type),
+            Some(record) => self.get_color_from_record(record, &self.shader_type),
             None => {
                 Color::new(1.0, 1.0, 1.0) * (1.0 - ((ray.direction.normalize().y + 1.0) / 2.0))
                     + Color::new(0.5, 0.5, 0.7) * ((ray.direction.normalize().y + 1.0) / 2.0)
@@ -95,7 +95,7 @@ impl Renderer {
         img
     }
 
-    fn get_color_from_record(&self, record: HitRecord, shader_type: ShaderType) -> Color {
+    fn get_color_from_record(&self, record: HitRecord, shader_type: &ShaderType) -> Color {
         match shader_type {
             ShaderType::Phong => self.shader_phong(record),
             ShaderType::Etc => {

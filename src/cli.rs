@@ -34,6 +34,7 @@ use std::{fs, path::Path, rc::Rc};
 
 use crate::{
     camera::*, const_vars::ConstContext, hit::HittableList, light::*, objects::*, renderer::*,
+    shaders::ShaderType,
 };
 
 pub fn init() -> ConstContext {
@@ -104,7 +105,7 @@ pub fn draw(ctx: ConstContext) {
     )));
 
     //render
-    let renderer = Renderer::new(world, light_group, camera, ctx);
+    let renderer = Renderer::new(world, light_group, camera, ctx, ShaderType::Phong);
     let img = renderer.render();
 
     //output image
