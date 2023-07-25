@@ -3,7 +3,11 @@ use std::rc::Rc;
 use camera::Camera;
 use light::Light;
 
-use crate::{hit::HittableList, objects::{Sphere, Plane}, renderer::{Renderer, Shader}};
+use crate::{
+    hit::HittableList,
+    objects::{Plane, Sphere},
+    renderer::{Renderer, Shader},
+};
 
 mod camera;
 mod hit;
@@ -13,13 +17,11 @@ mod objects;
 mod ray;
 mod renderer;
 
-const IMAGE_WIDTH: u32 = 400;
-const IMAGE_HEIGHT: u32 = 300;
 const SAMPLES_PER_PIXEL: u32 = 8;
 
 fn main() {
     //create camera
-    let camera = Camera::new();
+    let camera = Camera::new(400, 300);
 
     //create light
     let light = Light::new([-8.0, 8.0, -6.0].into(), 1.0, [1.0, 1.0, 1.0].into());

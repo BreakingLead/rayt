@@ -1,10 +1,16 @@
+use image::{ImageBuffer, Rgb, RgbImage};
+use rand::Rng;
 use std::f64::INFINITY;
 use std::time::SystemTime;
-use image::{RgbImage, ImageBuffer, Rgb};
-use rand::Rng;
 
-use crate::{camera::Camera, hit::{HittableList, Hittable}, light::Light, maths::Color, ray::Ray};
-use crate::{IMAGE_WIDTH, IMAGE_HEIGHT, SAMPLES_PER_PIXEL};
+use crate::SAMPLES_PER_PIXEL;
+use crate::{
+    camera::Camera,
+    hit::{Hittable, HittableList},
+    light::Light,
+    maths::Color,
+    ray::Ray,
+};
 
 pub enum Shader {
     Phong,

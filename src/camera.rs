@@ -6,6 +6,8 @@ use crate::{
 
 #[derive(Debug)]
 pub struct Camera {
+    image_width: usize,
+    image_height: usize,
     origin: Point3,
     lower_left_corner: Vec3,
     horizontal: Vec3,
@@ -13,7 +15,7 @@ pub struct Camera {
 }
 
 impl Camera {
-    pub fn new() -> Self {
+    pub fn new(image_width: usize, image_height: usize) -> Self {
         let aspect_ratio: f64 = IMAGE_WIDTH as f64 / IMAGE_HEIGHT as f64;
 
         let viewport_height: f64 = 2.0;
