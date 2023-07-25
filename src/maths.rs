@@ -2,6 +2,7 @@ use std::ops::{Add, Div, Mul, Sub};
 
 use image::Rgb;
 use rand::{thread_rng, Rng};
+use serde::Deserialize;
 
 pub type Color = Vec3;
 pub type Point3 = Vec3;

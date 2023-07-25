@@ -1,15 +1,34 @@
-use serde::Deserialize;
-
 use crate::hit::{Front, HitRecord, Hittable};
 use crate::maths::{Color, Point3, Vec3};
 use crate::ray::Ray;
 
+use serde::Deserialize;
+#[derive(Deserialize, Debug)]
+pub struct SerializationSphere {
+    radius: f64,
+    center: (f64, f64, f64),
+    color: (f64, f64, f64),
+    roughness: f64,
+    reflectivity: f64,
+}
 pub struct Sphere {
     radius: f64,
     center: Point3,
     color: Color,
     roughness: f64,
     reflectivity: f64,
+}
+
+impl From<&SerializationSphere> for Sphere {
+    fn from(value: &SerializationSphere) -> Self {
+        Self {
+            radius: value.radius,
+            center: value.center.into(),
+            color: value.color.into(),
+            roughness: value.roughness,
+            reflectivity: value.reflectivity,
+        }
+    }
 }
 
 impl Sphere {

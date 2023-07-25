@@ -1,7 +1,18 @@
+use serde::Deserialize;
+
 use crate::hit::{Front, HitRecord, Hittable};
 use crate::maths::{Color, Point3, Vec3};
 use crate::ray::Ray;
 
+#[derive(Deserialize, Debug)]
+pub struct SerializationPlane {
+    origin: (f64, f64, f64),
+    edge_x: (f64, f64, f64),
+    edge_y: (f64, f64, f64),
+    color: (f64, f64, f64),
+    roughness: f64,
+    reflectivity: f64,
+}
 pub struct Plane {
     origin: Point3,
     edge_x: Vec3,
@@ -9,6 +20,19 @@ pub struct Plane {
     color: Color,
     roughness: f64,
     reflectivity: f64,
+}
+
+impl From<&SerializationPlane> for Plane {
+    fn from(value: &SerializationPlane) -> Self {
+        Self {
+            origin: value.origin.into(),
+            edge_x: value.edge_x.into(),
+            edge_y: value.edge_y.into(),
+            color: value.color.into(),
+            roughness: value.roughness,
+            reflectivity: value.reflectivity,
+        }
+    }
 }
 
 impl Plane {

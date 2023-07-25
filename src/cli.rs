@@ -32,17 +32,31 @@
 
 use std::{fs, path::Path, rc::Rc};
 
+use serde::Deserialize;
+
+use crate::objects::plane::SerializationPlane;
 use crate::{
     camera::*, const_vars::ConstContext, hit::HittableList, light::*, objects::*, renderer::*,
     shaders::ShaderType,
 };
 
+use crate::objects::sphere::SerializationSphere;
+#[derive(Deserialize)]
+pub struct Config {
+    #[serde(rename = "Sphere")]
+    spheres: Vec<SerializationSphere>,
+    #[serde(rename = "Plane")]
+    planes: Vec<SerializationPlane>,
+}
+
 pub fn init() -> ConstContext {
     let config = fs::read_to_string(Path::new("config.toml")).unwrap();
+    let config: Config = toml::from_str(&config).unwrap();
 
     ConstContext {
         samples_per_pixel: 10,
         output: true,
+        config,
     }
 }
 
@@ -60,49 +74,14 @@ pub fn draw(ctx: ConstContext) {
 
     //create world with objects
     let mut world = HittableList::new();
-    world.add(Rc::new(Sphere::new(
-        [3.0, 1.0, -10.0].into(),
-        1.0,
-        [1.0, 1.0, 1.0].into(),
-        0.1,
-        1.0,
-    )));
-    world.add(Rc::new(Sphere::new(
-        [-3.0, 1.0, -10.0].into(),
-        3.0,
-        [1.0, 1.0, 1.0].into(),
-        0.1,
-        1.0,
-    )));
-    world.add(Rc::new(Sphere::new(
-        [-6.0, 1.0, -10.0].into(),
-        3.0,
-        [1.0, 1.0, 1.0].into(),
-        0.1,
-        1.0,
-    )));
-    world.add(Rc::new(Sphere::new(
-        [-4.5, 2.5, -10.0].into(),
-        3.0,
-        [1.0, 1.0, 1.0].into(),
-        0.1,
-        1.0,
-    )));
-    world.add(Rc::new(Sphere::new(
-        [0.0, 2.0, -2.0].into(),
-        1.0,
-        [1.0, 1.0, 1.0].into(),
-        0.1,
-        1.0,
-    )));
-    world.add(Rc::new(Plane::new(
-        [-8.0, -2.0, -5.0].into(),
-        [16.0, -1.0, 0.0].into(),
-        [0.0, 8.0, -10.0].into(),
-        [1.0, 1.0, 1.0].into(),
-        0.1,
-        1.0,
-    )));
+
+    for i in &ctx.config.spheres {
+        world.add(Rc::new(Sphere::from(i)));
+    }
+
+    for i in &ctx.config.planes {
+        world.add(Rc::new(Plane::from(i)));
+    }
 
     //render
     let renderer = Renderer::new(world, light_group, camera, ctx, ShaderType::Phong);
