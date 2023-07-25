@@ -58,83 +58,110 @@ pub struct Plane {
 
 impl Plane {
     pub fn new(origin: Point3, edge_x: Vec3, edge_y: Vec3) -> Self {
-        Self { origin, edge_x, edge_y }
+        Self {
+            origin,
+            edge_x,
+            edge_y,
+        }
     }
 
-    pub fn origin(&self) -> Point3 {
-        self.origin
-    }
-
-    pub fn edge_x(&self) -> Vec3 {
-        self.edge_x
-    }
-
-    pub fn edge_y(&self) -> Vec3 {
-        self.edge_y
+    pub fn vertices(&self) -> [Vec3; 4] {
+        [
+            self.origin,
+            self.origin + self.edge_x,
+            self.origin + self.edge_x + self.edge_y,
+            self.origin + self.edge_y,
+        ]
     }
 }
 
 impl Hittable for Plane {
     fn get_hit_record(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
-        //use the plane equation ax + by + cz + d = 0, where (A, B, C) is the normal vector of the plane.
-        let mut norm = self.edge_x.cross(&self.edge_y).normalize();
-        
-        //solve for d
-        let d = norm * self.origin * (-1.0);
+        // note: Figure <X> means that X is a vector.
 
-        //calculate k in line parametric equation P_vec = O_vec + k * dir_vec
-        let k = - (norm*ray.origin + d) / (norm*ray.direction);
+        // == PROOF ==
+        // point normal form equation of a plane:
+        // [KNOWN] origin[O] = (x0, y0, z0) (this is the origin of the plane);
+        //         normal[N] = ( A,  B,  C) ;
+        //         point [P] = ( x,  y,  z) which is on the plane;
+        //
+        // [SOLVE] the equation
+        //         obviously,
+        //             N*(OP) = 0
+        //             A(x-x0) + B(y-y0) + C(z-z0) = 0
+        //         simplify it:
+        //             Ax + By + Cz - (A x0 + B y0 + C z0) = 0
+        //         which is equal to the normal form of a plane:
+        //             Ax + By + Cz + D = 0
 
-        //identify whether k is in the acceptable range
-        if k < t_min || k > t_max {
+        // use the plane equation ax + by + cz + d = 0, where (A, B, C) is the normal vector of the plane
+        let mut normal = self.edge_x.cross(&self.edge_y).normalize();
+
+        // solve for d
+        let d = normal * self.origin * (-1.0);
+
+        // calculate k in line parametric equation <P> = <O> + t * <D>
+
+        // == PROOF ==
+        // [KNOWN]        P = O + tD  ; (O:  ray.origin)
+        //         <MP> * N = 0       ; (M: self.origin)
+        //                D = - (N*M) ; (N: self.normal)
+        // [SOLVE] t
+        //
+        //         we can found:
+        //             MP = P-M = O + tD - M
+        //         so
+        //             (O + tD - M) * N = 0
+        //                tD*N + O*N - M*N = 0
+        //                            t = (M*N - O*N) / D*N
+        //                            t =  (-D - O*N) / D*N
+        let t = (-d - ray.origin * normal) / (ray.direction * normal);
+
+        // identify whether k is in the acceptable range
+        if t < t_min || t > t_max {
             return None;
         }
 
-        //get intersection point
-        let intersect_point = ray.origin + ray.direction * k;
+        // get intersection point
+        let intersection = ray.at(t);
 
-        //calculate 4 vertices of the plane
-        let vertice_1: Point3 = self.origin;
-        let vertice_2: Point3 = self.origin + self.edge_x;
-        let vertice_3: Point3 = self.origin + self.edge_x + self.edge_y;
-        let vertice_4: Point3 = self.origin + self.edge_y;
-        
-        //calculate edge vector
-        let edge_1: Vec3 = vertice_2 - vertice_1;
-        let edge_2: Vec3 = vertice_3 - vertice_2;
-        let edge_3: Vec3 = vertice_4 - vertice_3;
-        let edge_4: Vec3 = vertice_1 - vertice_4;
-        
-        //calculate interesetion point vector relative to the four vertices
-        let point_vec_1: Point3 = intersect_point - vertice_1;
-        let point_vec_2: Point3 = intersect_point - vertice_2;
-        let point_vec_3: Point3 = intersect_point - vertice_3;
-        let point_vec_4: Point3 = intersect_point - vertice_4;
-        let result_1 = edge_1.cross(&point_vec_1).normalize();
-        let result_2 = edge_2.cross(&point_vec_2).normalize();
-        let result_3 = edge_3.cross(&point_vec_3).normalize();
-        let result_4 = edge_4.cross(&point_vec_4).normalize();
+        // calculate 4 vertices of the plane
+        let vertices = self.vertices();
 
-        //collect results into an array
-        let results = [result_1, result_2, result_3, result_4];
-        
-        //identify whether the four cross results are likely equal to the normal vector
+        // calculate edge vector
+        let edges = [
+            vertices[1] - vertices[0],
+            vertices[2] - vertices[1],
+            vertices[3] - vertices[2],
+            vertices[0] - vertices[3],
+        ];
+
+        // calculate interesetion point vector relative to the four vertices
+        let point_vecs = vertices.map(|v| intersection - v);
+
+        let results: Vec<Vec3> = edges
+            .iter()
+            .enumerate()
+            .map(|(i, v)| v.cross(&point_vecs[i]).normalize())
+            .collect();
+
+        // identify whether the four cross results are likely equal to the normal vector
         for result in results {
-            if (result - norm).length() > 0.001 {
+            if (result - normal).length() > 0.001 {
                 return None;
             }
         }
 
-        //flip the normal vector if necessary
-        if ray.direction * norm > 0.0 {
-            norm = norm * (-1.0);
+        // flip the normal vector if necessary
+        if ray.direction * normal > 0.0 {
+            normal = normal * (-1.0);
         }
 
-        return Some(HitRecord { 
-            point: intersect_point, 
-            normal: norm, 
-            front_face: Front::Outward, 
-            t: k,
+        return Some(HitRecord {
+            point: intersection,
+            normal,
+            front_face: Front::Outward,
+            t,
         });
     }
 }
