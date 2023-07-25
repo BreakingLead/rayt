@@ -10,6 +10,7 @@ mod maths;
 mod objects;
 mod ray;
 mod renderer;
+mod shaders;
 
 fn main() {
     let ctx = init();

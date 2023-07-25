@@ -11,20 +11,14 @@ use crate::{
     light::{Light, LightGroup},
     maths::Color,
     ray::Ray,
+    shaders::Shader,
 };
-
-pub enum Shader {
-    Phong,
-    BlinnPhong,
-    WhittedStyleRayTracing,
-    PathTracing,
-}
 
 pub struct Renderer {
     pub world: HittableList,
     pub light_group: LightGroup,
     pub camera: Camera,
-    pub shader: Shader,
+    pub shader: Box<dyn Shader>,
     pub ctx: ConstContext,
 }
 
@@ -33,7 +27,7 @@ impl Renderer {
         world: HittableList,
         light_group: LightGroup,
         camera: Camera,
-        shader: Shader,
+        shader: Box<dyn Shader>,
         ctx: ConstContext,
     ) -> Self {
         Self {
@@ -47,31 +41,10 @@ impl Renderer {
 
     fn get_pixel_color(&self, ray: &Ray) -> Color {
         match self.world.get_hit_record(ray, 0.0, INFINITY) {
-            Some(record) => {
-                match self.shader {
-                    Shader::Phong => {
-                        //todo
-                        Color::new(1.0, 1.0, 1.0)
-                    }
-                    Shader::BlinnPhong => {
-                        //todo
-                        Color::new(1.0, 1.0, 1.0)
-                    }
-                    Shader::WhittedStyleRayTracing => {
-                        //todo
-                        Color::new(1.0, 1.0, 1.0)
-                    }
-                    Shader::PathTracing => {
-                        //todo
-                        Color::new(1.0, 1.0, 1.0)
-                    }
-                }
-            }
+            Some(record) => self.shader.get_color_from_record(record),
             None => {
-                let y_ratio = (ray.direction.normalize().y + 1.0) / 2.0;
-
-                // Linear interpolation method
-                Color::new(1.0, 1.0, 1.0) * (1.0 - y_ratio) + Color::new(0.5, 0.5, 0.7) * y_ratio
+                Color::new(1.0, 1.0, 1.0) * (1.0 - ((ray.direction.normalize().y + 1.0) / 2.0))
+                    + Color::new(0.5, 0.5, 0.7) * ((ray.direction.normalize().y + 1.0) / 2.0)
             }
         }
     }
