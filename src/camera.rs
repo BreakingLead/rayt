@@ -42,8 +42,9 @@ impl Camera {
         let y_ratio = y as f64 / (height - 1) as f64;
         Ray::new(
             self.origin,
-            self.lower_left_corner + self.horizontal * x_ratio + self.vertical * y_ratio
-                - self.origin,
+            (self.lower_left_corner + self.horizontal * x_ratio + self.vertical * y_ratio
+                - self.origin)
+                .normalize(),
         )
     }
 }
