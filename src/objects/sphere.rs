@@ -1,15 +1,24 @@
 use crate::hit::{Front, HitRecord, Hittable};
-use crate::maths::{Point3, Vec3};
+use crate::maths::{Point3, Vec3, Color};
 use crate::ray::Ray;
 
 pub struct Sphere {
     radius: f64,
     center: Point3,
+    color: Color,
+    roughness: f64,
+    reflectivity: f64,
 }
 
 impl Sphere {
-    pub fn new(center: Vec3, radius: f64) -> Self {
-        Self { radius, center }
+    pub fn new(center: Vec3, radius: f64, color: Color, roughness: f64, reflectivity: f64) -> Self {
+        Self {
+            radius,
+            center,
+            color,
+            roughness,
+            reflectivity,
+        }
     }
 }
 

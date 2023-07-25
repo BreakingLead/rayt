@@ -1,19 +1,32 @@
 use crate::hit::{Front, HitRecord, Hittable};
-use crate::maths::{Point3, Vec3};
+use crate::maths::{Color, Point3, Vec3};
 use crate::ray::Ray;
 
 pub struct Plane {
     origin: Point3,
     edge_x: Vec3,
     edge_y: Vec3,
+    color: Color,
+    roughness: f64,
+    reflectivity: f64,
 }
 
 impl Plane {
-    pub fn new(origin: Point3, edge_x: Vec3, edge_y: Vec3) -> Self {
+    pub fn new(
+        origin: Vec3,
+        edge_x: Vec3,
+        edge_y: Vec3,
+        color: Color,
+        roughness: f64,
+        reflectivity: f64,
+    ) -> Self {
         Self {
             origin,
             edge_x,
             edge_y,
+            color,
+            roughness,
+            reflectivity,
         }
     }
 

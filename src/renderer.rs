@@ -4,11 +4,11 @@ use rand::Rng;
 use std::f64::INFINITY;
 use std::time::SystemTime;
 
-use crate::const_vars::ConstContext;
 use crate::{
     camera::Camera,
+    const_vars::ConstContext,
     hit::{Hittable, HittableList},
-    light::Light,
+    light::{Light, LightGroup},
     maths::Color,
     ray::Ray,
 };
@@ -22,7 +22,7 @@ pub enum Shader {
 
 pub struct Renderer {
     pub world: HittableList,
-    pub light: Light,
+    pub light_group: LightGroup,
     pub camera: Camera,
     pub shader: Shader,
     pub ctx: ConstContext,
@@ -31,14 +31,14 @@ pub struct Renderer {
 impl Renderer {
     pub fn new(
         world: HittableList,
-        light: Light,
+        light_group: LightGroup,
         camera: Camera,
         shader: Shader,
         ctx: ConstContext,
     ) -> Self {
         Self {
             world,
-            light,
+            light_group,
             camera,
             shader,
             ctx,
@@ -48,10 +48,24 @@ impl Renderer {
     fn get_pixel_color(&self, ray: &Ray) -> Color {
         match self.world.get_hit_record(ray, 0.0, INFINITY) {
             Some(record) => {
-                // TODO: Shader for this place
-                let normal = record.normal;
-
-                Color::new(normal.x + 1.0, normal.y + 1.0, normal.z + 1.0) * 0.5
+                match self.shader {
+                    Shader::Phong => {
+                        //todo
+                        Color::new(1.0, 1.0, 1.0)
+                    }
+                    Shader::BlinnPhong => {
+                        //todo
+                        Color::new(1.0, 1.0, 1.0)
+                    }
+                    Shader::WhittedStyleRayTracing => {
+                        //todo
+                        Color::new(1.0, 1.0, 1.0)
+                    }
+                    Shader::PathTracing => {
+                        //todo
+                        Color::new(1.0, 1.0, 1.0)
+                    }
+                }
             }
             None => {
                 let y_ratio = (ray.direction.normalize().y + 1.0) / 2.0;
