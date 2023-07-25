@@ -1,7 +1,7 @@
 use std::ops::{Add, Div, Mul, Sub};
 
 use image::Rgb;
-use rand::{random, thread_rng, Rng};
+use rand::{thread_rng, Rng};
 
 pub type Color = Vec3;
 pub type Point3 = Vec3;

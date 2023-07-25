@@ -16,7 +16,6 @@ mod hit;
 mod maths;
 mod objects;
 mod ray;
-mod utils;
 
 const IMAGE_WIDTH: u32 = 400;
 const IMAGE_HEIGHT: u32 = 300;
@@ -52,7 +51,7 @@ fn main() {
     for (x, y, pixel) in img.enumerate_pixels_mut() {
         let y = IMAGE_HEIGHT - y - 1;
         let mut pixel_color = Color::new(0.0, 0.0, 0.0);
-        for i in 0..SAMPLES_PER_PIXEL {
+        for _i in 0..SAMPLES_PER_PIXEL {
             let ray = camera.get_ray(
                 IMAGE_WIDTH,
                 IMAGE_HEIGHT,
