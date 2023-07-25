@@ -30,15 +30,18 @@
 
 // }
 
-use std::rc::Rc;
+use std::{fs, path::Path, rc::Rc};
 
 use crate::{
     camera::*, const_vars::ConstContext, hit::HittableList, light::*, objects::*, renderer::*,
 };
 
 pub fn init() -> ConstContext {
+    let config = fs::read_to_string(Path::new("../config.toml")).unwrap();
+    
     ConstContext {
         samples_per_pixel: 10,
+        output: true,
     }
 }
 
@@ -64,7 +67,7 @@ pub fn draw(ctx: ConstContext) {
 
     //render
     let renderer = Renderer::new(world, light, camera, Shader::PathTracing, ctx);
-    let img = renderer.render(true);
+    let img = renderer.render();
 
     //output image
     img.save("test.png").unwrap();

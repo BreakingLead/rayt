@@ -1,4 +1,5 @@
 use image::{ImageBuffer, Rgb, RgbImage};
+use indicatif::{ProgressBar, ProgressStyle};
 use rand::Rng;
 use std::f64::INFINITY;
 use std::time::SystemTime;
@@ -61,18 +62,24 @@ impl Renderer {
         }
     }
 
-    pub fn render(&self, output: bool) -> ImageBuffer<Rgb<u8>, Vec<u8>> {
+    pub fn render(&self) -> ImageBuffer<Rgb<u8>, Vec<u8>> {
         let mut img = RgbImage::new(self.camera.image_width, self.camera.image_height);
+
         let start_t = SystemTime::now();
         let mut rng = rand::thread_rng();
 
+        let bar = ProgressBar::new((self.camera.image_height * self.camera.image_width).into())
+            .with_style(
+                ProgressStyle::with_template(
+                    "{spinner:.green}  [{percent:.}%] [{elapsed_precise}] [{bar:60.cyan/blue}] {pos:>7.green}/{len:7.bold} {msg:>}",
+                )
+                .unwrap()
+                .progress_chars("#>-"),
+            );
+
+        // Draw pixels
         for (x, y, pixel) in img.enumerate_pixels_mut() {
-            if output {
-                // TODO: output rendering time & process
-            }
-
             let y = self.camera.image_height as u32 - y - 1;
-
             let mut pixel_color = Color::new(0.0, 0.0, 0.0);
 
             for i in 0..self.ctx.samples_per_pixel {
@@ -88,8 +95,15 @@ impl Renderer {
             pixel_color = pixel_color / self.ctx.samples_per_pixel as f64;
 
             *pixel = pixel_color.into();
+            bar.inc(1);
         }
+        bar.finish_and_clear();
+
         let render_time = start_t.elapsed().unwrap().as_millis() as f64 / 1000.0;
+
+        if self.ctx.output {
+            println!("Time elapsed: {}", render_time);
+        }
 
         img
     }
