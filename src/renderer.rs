@@ -3,7 +3,7 @@ use std::time::SystemTime;
 use image::{RgbImage, ImageBuffer, Rgb};
 use rand::Rng;
 
-use crate::{camera::Camera, hit::{HittableList, Hittable}, light::Light, maths::Color, ray::Ray};
+use crate::{camera::Camera, hit::{HittableList, Hittable}, light::{Light, LightGroup}, maths::Color, ray::Ray};
 use crate::{IMAGE_WIDTH, IMAGE_HEIGHT, SAMPLES_PER_PIXEL};
 
 pub enum Shader {
@@ -15,41 +15,46 @@ pub enum Shader {
 
 pub struct Renderer {
     pub world: HittableList,
-    pub light: Light,
+    pub light_group: LightGroup,
     pub camera: Camera,
     pub shader: Shader,
 }
 
 impl Renderer {
-    pub fn new(world: HittableList, light: Light, camera: Camera, shader: Shader) -> Self {
-        let res = Self {
-            world,
-            light,
-            camera,
-            shader,
-        };
-
-        res
+    pub fn new(world: HittableList, light_group: LightGroup, camera: Camera, shader: Shader) -> Self {
+        Self { world, light_group, camera, shader }
     }
 
     fn get_pixel_color(&self, ray: &Ray) -> Color {
         match self.world.get_hit_record(ray, 0.0, INFINITY) {
             Some(record) => {
-                let normal = record.normal;
-
-                Color::new(normal.x + 1.0, normal.y + 1.0, normal.z + 1.0) * 0.5
+                match self.shader {
+                    Shader::Phong => {
+                        //todo
+                        Color::new(1.0, 1.0, 1.0)
+                    }
+                    Shader::BlinnPhong => {
+                        //todo
+                        Color::new(1.0, 1.0, 1.0)
+                    }
+                    Shader::WhittedStyleRayTracing => {
+                        //todo
+                        Color::new(1.0, 1.0, 1.0)
+                    }
+                    Shader::PathTracing => {
+                        //todo
+                        Color::new(1.0, 1.0, 1.0)
+                    }
+                }
             }
             None => {
-                let y_ratio = (ray.direction.normalize().y + 1.0) / 2.0;
-
-                Color::new(1.0, 1.0, 1.0) * (1.0 - y_ratio) + Color::new(0.5, 0.5, 0.7) * y_ratio
+                Color::new(0.0, 0.0, 0.0)
             }
         }
     }
 
     pub fn render(&self, output: bool) -> ImageBuffer<Rgb<u8>, Vec<u8>> {
         let mut img = RgbImage::new(IMAGE_WIDTH, IMAGE_HEIGHT);
-        let start_t = SystemTime::now();
         let mut rng = rand::thread_rng();
 
         for (x, y, pixel) in img.enumerate_pixels_mut() {
@@ -75,7 +80,6 @@ impl Renderer {
 
             *pixel = pixel_color.into();
         }
-        let render_time = start_t.elapsed().unwrap().as_millis() as f64 / 1000.0;
 
         img
     }
