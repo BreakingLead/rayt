@@ -3,6 +3,7 @@ use crate::maths::{Color, Point3, Vec3};
 use crate::ray::Ray;
 
 use serde::Deserialize;
+
 #[derive(Deserialize, Debug)]
 pub struct SerializationSphere {
     radius: f64,
@@ -56,7 +57,7 @@ impl Hittable for Sphere {
         }
 
         let mut root = (-half_b - delta.sqrt()) / a;
-        if root < t_min || t_max < root {
+        if root <= t_min || root >= t_max {
             root = (-half_b + delta.sqrt()) / a;
             if root < t_min || t_max < root {
                 return None;
