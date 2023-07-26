@@ -11,6 +11,7 @@ mod objects;
 mod ray;
 mod renderer;
 mod shaders;
+mod bsdf;
 
 fn main() {
     let ctx = init();

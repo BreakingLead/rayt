@@ -147,6 +147,7 @@ impl Hittable for Plane {
         }
 
         return Some(HitRecord {
+            obj: self,
             point: intersection,
             normal,
             front_face: Front::Outward,

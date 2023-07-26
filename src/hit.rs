@@ -7,7 +7,8 @@ pub enum Front {
     Outward,
 }
 
-pub struct HitRecord {
+pub struct HitRecord<'a> {
+    pub obj: &'a dyn Hittable,
     pub point: Vec3,
     pub normal: Vec3,
     pub front_face: Front,

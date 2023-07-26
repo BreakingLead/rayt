@@ -66,6 +66,7 @@ impl Hittable for Sphere {
         let outward_normal = (ray.at(root) - self.center) / self.radius;
 
         Some(HitRecord {
+            obj: self,
             point: ray.at(root),
             normal: outward_normal,
             front_face: {

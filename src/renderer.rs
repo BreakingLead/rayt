@@ -1,15 +1,14 @@
 use image::{ImageBuffer, Rgb, RgbImage};
 use indicatif::{ProgressBar, ProgressStyle};
 use rand::Rng;
-use std::f64::INFINITY;
 use std::time::SystemTime;
 
 use crate::{
     camera::Camera,
     const_vars::ConstContext,
-    hit::{HitRecord, Hittable, HittableList},
+    hit::HittableList,
     light::LightGroup,
-    maths::{Color, Point3, Vec3},
+    maths::Color,
     ray::Ray,
     shaders::ShaderType,
 };
@@ -20,6 +19,7 @@ pub struct Renderer {
     pub camera: Camera,
     pub ctx: ConstContext,
     pub shader_type: ShaderType,
+    pub gamma: f64,
 }
 
 impl Renderer {
@@ -29,6 +29,7 @@ impl Renderer {
         camera: Camera,
         ctx: ConstContext,
         shader_type: ShaderType,
+        gamma: f64,
     ) -> Self {
         Self {
             world,
@@ -36,27 +37,14 @@ impl Renderer {
             camera,
             ctx,
             shader_type,
+            gamma,
         }
     }
 
-    fn get_pixel_color(&self, ray: &Ray, depth: i32) -> Color {
-        if depth <= 0 {
-            return (0.0, 0.0, 0.0).into();
-        }
-
-        match self.world.get_hit_record(ray, 0.0, INFINITY) {
-            Some(record) => {
-                let target: Point3 =
-                    record.point + record.normal + Vec3::new_random_in_unit_circle();
-
-                self.get_pixel_color(&Ray::new(record.point, target - record.point), depth - 1)
-                    * 0.5
-                // self.get_color_from_record(record, &self.shader_type);
-            }
-            None => {
-                Color::new(1.0, 1.0, 1.0) * (1.0 - ((ray.direction.normalize().y + 1.0) / 2.0))
-                    + Color::new(0.5, 0.5, 0.7) * ((ray.direction.normalize().y + 1.0) / 2.0)
-            }
+    pub fn get_pixel_color(&self, ray: &Ray) -> Color {
+        match self.shader_type {
+            ShaderType::PathTracing => self.shader_path_tracing(ray, self.ctx.max_depth as i32)
+                                            .gamma_correction(self.gamma),
         }
     }
 
@@ -88,7 +76,7 @@ impl Renderer {
                     y as f64 + rng.gen::<f64>(),
                 );
 
-                pixel_color = pixel_color + self.get_pixel_color(&ray, self.ctx.max_depth as i32);
+                pixel_color = pixel_color + self.get_pixel_color(&ray);
             }
             pixel_color = pixel_color / self.ctx.samples_per_pixel as f64;
 
@@ -106,12 +94,4 @@ impl Renderer {
         img
     }
 
-    fn get_color_from_record(&self, record: HitRecord, shader_type: &ShaderType) -> Color {
-        match shader_type {
-            ShaderType::Phong => self.shader_phong(record),
-            ShaderType::Etc => {
-                todo!()
-            }
-        }
-    }
 }

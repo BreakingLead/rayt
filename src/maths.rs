@@ -1,10 +1,11 @@
 use std::ops::{Add, Div, Mul, Sub};
+use core::f64::consts::PI;
 
 use image::Rgb;
 use rand::{thread_rng, Rng};
-use serde::Deserialize;
 
 pub type Color = Vec3;
+pub type HDR = Vec3;
 pub type Point3 = Vec3;
 
 #[derive(Clone, Copy, Debug)]
@@ -24,25 +25,6 @@ impl Vec3 {
             x: 0.0,
             y: 0.0,
             z: 0.0,
-        }
-    }
-
-    pub fn new_random(min: f64, max: f64) -> Self {
-        let mut rng = thread_rng();
-        Self::new(
-            rng.gen_range(min..max),
-            rng.gen_range(min..max),
-            rng.gen_range(min..max),
-        )
-    }
-
-    pub fn new_random_in_unit_circle() -> Self {
-        loop {
-            let n = Self::new_random(-1.0, 1.0);
-            if n.length_squared() >= 1.0 {
-                continue;
-            };
-            return n;
         }
     }
 }
@@ -66,6 +48,44 @@ impl Vec3 {
             y: -(self.x * other.z - other.x * self.z),
             z: self.x * other.y - other.x * self.y,
         }
+    }
+
+    pub fn gamma_correction(&self, gamma: f64) -> Color {
+        Self::new(
+            self.x.powf(1.0/gamma).clamp(0.0, 1.0), 
+            self.y.powf(1.0/gamma).clamp(0.0, 1.0), 
+            self.z.powf(1.0/gamma).clamp(0.0, 1.0),
+        )
+    }
+
+    pub fn rand_hemisphere_dir(norm: Vec3) -> Vec3 {
+        let mut rng = thread_rng();
+        let theta = rng.gen::<f64>() * PI / 2.0;
+        let phi = rng.gen::<f64>() * PI * 2.0;
+        let rand_dir = Vec3::new(theta.sin()*phi.cos(), theta.sin()*phi.sin(), theta.cos());
+
+        let normal = norm.normalize();
+        let mut x = Vec3::new(1.0, 0.0, 0.0);
+        let mut y = Vec3::new(0.0, 1.0, 0.0);
+        let mut z = normal;
+        if normal == Vec3::new(0.0, 0.0, 1.0) {
+            x = Vec3::new(1.0, 0.0, 0.0);
+        }
+        else if normal == Vec3::new(0.0, 0.0, -1.0) {
+            x = Vec3::new(-1.0, 0.0, 0.0);
+        }
+        else {
+            x = Vec3::new(0.0, 0.0, 1.0).cross(&normal).normalize();
+        }
+        y = z.cross(&x).normalize();
+
+        let rotated_dir = Vec3::new(
+            x.x*rand_dir.x + y.x*rand_dir.y + z.x*rand_dir.z, 
+            x.y*rand_dir.x + y.y*rand_dir.y + z.y*rand_dir.z, 
+            x.z*rand_dir.x + y.z*rand_dir.y + z.z*rand_dir.z,
+        ).normalize();
+
+        rotated_dir
     }
 }
 
