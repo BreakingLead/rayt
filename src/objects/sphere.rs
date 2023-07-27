@@ -3,6 +3,7 @@ use crate::maths::{Color, Point3, Vec3};
 use crate::ray::Ray;
 
 use serde::Deserialize;
+
 #[derive(Deserialize, Debug)]
 pub struct SerializationSphere {
     radius: f64,
@@ -11,6 +12,7 @@ pub struct SerializationSphere {
     roughness: f64,
     reflectivity: f64,
 }
+
 pub struct Sphere {
     radius: f64,
     center: Point3,

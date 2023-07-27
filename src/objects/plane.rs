@@ -1,8 +1,8 @@
-use serde::Deserialize;
-
 use crate::hit::{Front, HitRecord, Hittable};
 use crate::maths::{Color, Point3, Vec3};
 use crate::ray::Ray;
+
+use serde::Deserialize;
 
 #[derive(Deserialize, Debug)]
 pub struct SerializationPlane {
@@ -13,6 +13,7 @@ pub struct SerializationPlane {
     roughness: f64,
     reflectivity: f64,
 }
+
 pub struct Plane {
     origin: Point3,
     edge_x: Vec3,
