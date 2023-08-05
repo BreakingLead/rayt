@@ -19,6 +19,7 @@ pub struct Renderer {
     pub camera: Camera,
     pub ctx: ConstContext,
     pub shader_type: ShaderType,
+    pub probability_rr: f64,
     pub gamma: f64,
 }
 
@@ -29,6 +30,7 @@ impl Renderer {
         camera: Camera,
         ctx: ConstContext,
         shader_type: ShaderType,
+        probability_rr: f64,
         gamma: f64,
     ) -> Self {
         Self {
@@ -37,6 +39,7 @@ impl Renderer {
             camera,
             ctx,
             shader_type,
+            probability_rr,
             gamma,
         }
     }

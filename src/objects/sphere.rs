@@ -80,4 +80,16 @@ impl Hittable for Sphere {
             t: root,
         })
     }
+    
+    fn get_color(&self) -> Color {
+        self.color
+    }
+
+    fn get_roughness(&self) -> f64 {
+        self.roughness
+    }
+
+    fn get_reflectivity(&self) -> f64 {
+        self.reflectivity
+    }
 }

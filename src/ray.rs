@@ -8,6 +8,7 @@ pub struct Ray {
 
 impl Ray {
     pub fn new(origin: Point3, direction: Vec3) -> Self {
+        let direction = direction.normalize();
         Ray { origin, direction }
     }
 

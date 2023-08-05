@@ -85,6 +85,10 @@ impl Hittable for Plane {
 
         // use the plane equation ax + by + cz + d = 0, where (a, b, c) is the normal vector of the plane
         let mut normal = self.edge_x.cross(&self.edge_y).normalize();
+        
+        if ray.direction * normal == 0.0 {
+            return None;
+        }
 
         // solve for d
         let d = normal * self.origin * (-1.0);
@@ -153,5 +157,17 @@ impl Hittable for Plane {
             front_face: Front::Outward,
             t,
         });
+    }
+
+    fn get_color(&self) -> Color {
+        self.color
+    }
+
+    fn get_roughness(&self) -> f64 {
+        self.roughness
+    }
+
+    fn get_reflectivity(&self) -> f64 {
+        self.reflectivity
     }
 }

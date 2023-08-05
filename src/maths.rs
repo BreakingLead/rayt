@@ -50,6 +50,22 @@ impl Vec3 {
         }
     }
 
+    pub fn mix(&self, color: Color) -> Color {
+        Self::new(
+            self.x * color.x,
+            self.y * color.y,
+            self.z * color.z,
+        )
+    }
+
+    pub fn clamp(&self, min: f64, max: f64) -> Color {
+        Self::new(
+            self.x.clamp(min, max),
+            self.y.clamp(min, max),
+            self.z.clamp(min, max),
+        )
+    }
+
     pub fn gamma_correction(&self, gamma: f64) -> Color {
         Self::new(
             self.x.powf(1.0/gamma).clamp(0.0, 1.0), 

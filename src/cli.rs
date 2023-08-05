@@ -71,15 +71,21 @@ pub fn draw(ctx: ConstContext) {
 
     //create light group
     let mut light_group = LightGroup::new();
-    light_group.add(Rc::new(HDRILight::new(
+    light_group.add(Light::HDRILight(HDRILight::new(
+        [1.0, 1.0, 1.0].into(),
         1.0,
     )));
-    light_group.add(Rc::new(PointLight::new(
+    /*light_group.add(Light::SunLight(SunLight::new(
+        [1.0, -0.6, -1.0].into(),
+        1.0,
+        [1.0, 1.0, 1.0].into(),
+    )));
+    light_group.add(Light::PointLight(PointLight::new(
         [-8.0, 8.0, -6.0].into(),
         0.5,
         1.0,
         [1.0, 1.0, 1.0].into(),
-    )));
+    )));*/
 
     //create world with objects
     let mut world = HittableList::new();
@@ -93,7 +99,15 @@ pub fn draw(ctx: ConstContext) {
     }
 
     //render
-    let renderer = Renderer::new(world, light_group, camera, ctx, ShaderType::PathTracing, 2.2);
+    let renderer = Renderer::new(
+        world, 
+        light_group, 
+        camera, 
+        ctx, 
+        ShaderType::PathTracing, 
+        0.8, 
+        2.2
+    );
     let img = renderer.render();
 
     //output image
