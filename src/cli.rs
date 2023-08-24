@@ -71,9 +71,7 @@ pub fn draw(ctx: ConstContext) {
 
     //create light group
     let mut light_group = LightGroup::new();
-    light_group.add(Rc::new(HDRILight::new(
-        1.0,
-    )));
+    light_group.add(Rc::new(HDRILight::new(1.0)));
     light_group.add(Rc::new(PointLight::new(
         [-8.0, 8.0, -6.0].into(),
         0.5,
@@ -93,7 +91,14 @@ pub fn draw(ctx: ConstContext) {
     }
 
     //render
-    let renderer = Renderer::new(world, light_group, camera, ctx, ShaderType::PathTracing, 2.2);
+    let renderer = Renderer::new(
+        world,
+        light_group,
+        camera,
+        ctx,
+        ShaderType::PathTracing,
+        2.2,
+    );
     let img = renderer.render();
 
     //output image

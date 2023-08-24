@@ -45,6 +45,7 @@ impl Renderer {
         match self.shader_type {
             ShaderType::PathTracing => self.shader_path_tracing(ray, self.ctx.max_depth as i32)
                                             .gamma_correction(self.gamma),
+            ShaderType::
         }
     }
 
@@ -83,6 +84,7 @@ impl Renderer {
             *pixel = pixel_color.into();
             bar.inc(1);
         }
+
         bar.finish_and_clear();
 
         let render_time = start_t.elapsed().unwrap().as_millis() as f64 / 1000.0;
