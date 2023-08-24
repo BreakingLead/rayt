@@ -4,13 +4,8 @@ use rand::Rng;
 use std::time::SystemTime;
 
 use crate::{
-    camera::Camera,
-    const_vars::ConstContext,
-    hit::HittableList,
-    light::LightGroup,
-    maths::Color,
-    ray::Ray,
-    shaders::ShaderType,
+    camera::Camera, const_vars::ConstContext, hit::HittableList, light::LightGroup, maths::Color,
+    ray::Ray, shaders::ShaderType,
 };
 
 pub struct Renderer {
@@ -46,9 +41,10 @@ impl Renderer {
 
     pub fn get_pixel_color(&self, ray: &Ray) -> Color {
         match self.shader_type {
-            ShaderType::PathTracing => self.shader_path_tracing(ray, self.ctx.max_depth as i32)
-                                            .gamma_correction(self.gamma),
-            ShaderType::
+            ShaderType::PathTracing => self
+                .shader_path_tracing(ray, self.ctx.max_depth as i32)
+                .gamma_correction(self.gamma),
+            ShaderType::LeadTest => Color::new(0.0, 0.0, 0.0),
         }
     }
 
@@ -98,5 +94,4 @@ impl Renderer {
 
         img
     }
-
 }

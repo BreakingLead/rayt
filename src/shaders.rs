@@ -1,11 +1,11 @@
-use std::{f64::INFINITY};
 use rand::{thread_rng, Rng};
+use std::f64::INFINITY;
 
-use crate::{hit::{HitRecord, Hittable}, maths::{Color, Vec3, HDR}, renderer::Renderer, ray::Ray, light::*};
 use crate::bsdf::BSDF;
 use crate::{
-    hit::{HitRecord, Hittable},
-    maths::{Color, Vec3, HDR},
+    hit::Hittable,
+    light::*,
+    maths::{Vec3, HDR},
     ray::Ray,
     renderer::Renderer,
 };
@@ -47,40 +47,40 @@ impl Renderer {
                     if let Light::SunLight(sunlight) = light {
                         let check_ray = Ray::new(ray.origin, sunlight.direction * (-1.0));
                         if let None = self.world.get_hit_record(&check_ray, 0.0001, INFINITY) {
-                            light_contrib = 
-                                light_contrib 
-                                + (sunlight.color * sunlight.intensity)
-                                .mix(BSDF::cook_torrance_brdf(
-                                    record.obj.get_roughness(), 
-                                    record.obj.get_reflectivity(), 
-                                    record.obj.get_roughness(), 
-                                    wo, 
-                                    wi, 
-                                    record.normal, 
-                                    record.obj.get_color(),
-                                )) / self.probability_rr;
+                            light_contrib = light_contrib
+                                + (sunlight.color * sunlight.intensity).mix(
+                                    BSDF::cook_torrance_brdf(
+                                        record.obj.get_roughness(),
+                                        record.obj.get_reflectivity(),
+                                        record.obj.get_roughness(),
+                                        wo,
+                                        wi,
+                                        record.normal,
+                                        record.obj.get_color(),
+                                    ),
+                                ) / self.probability_rr;
                         }
                     }
                 }
-                return 
-                    light_contrib 
+                return light_contrib
                     + BSDF::cook_torrance_brdf(
-                        record.obj.get_roughness(), 
-                        record.obj.get_reflectivity(), 
-                        record.obj.get_roughness(), 
-                        wo, 
-                        wi, 
-                        record.normal, 
+                        record.obj.get_roughness(),
+                        record.obj.get_reflectivity(),
+                        record.obj.get_roughness(),
+                        wo,
+                        wi,
+                        record.normal,
                         record.obj.get_color(),
-                    ) 
+                    )
                     .mix(self.shader_path_tracing(&rand_ray, depth - 1))
-                    / self.probability_rr;
+                        / self.probability_rr;
             }
             None => {
                 for light in &self.light_group.lights {
                     if let Light::HDRILight(hdrilight) = light {
                         if let None = self.world.get_hit_record(ray, 0.0001, INFINITY) {
-                            total_emmision = total_emmision + hdrilight.get_hdr_value(ray.direction);
+                            total_emmision =
+                                total_emmision + hdrilight.get_hdr_value(ray.direction);
                         }
                     }
                 }

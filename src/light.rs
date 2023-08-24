@@ -1,6 +1,4 @@
 use crate::maths::{Point3, Vec3, Color, HDR};
-use crate::ray::Ray;
-use crate::hit::{HitRecord, Front, Hittable};
 
 pub enum Light {
     HDRILight(HDRILight),

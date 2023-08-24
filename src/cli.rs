@@ -47,6 +47,7 @@ pub struct Config {
     height: u32,
     samples: u32,
     max_depth: u32,
+    render_type: String,
     #[serde(rename = "Sphere")]
     spheres: Vec<SerializationSphere>,
     #[serde(rename = "Plane")]
@@ -99,15 +100,19 @@ pub fn draw(ctx: ConstContext) {
     }
 
     //render
-    let renderer = Renderer::new(
-        world, 
-        light_group, 
-        camera, 
-        ctx, 
-        ShaderType::PathTracing, 
-        0.8, 
-        2.2
-    );
+    let renderer = if ctx.config.render_type == "PathTracing" {
+        Renderer::new(
+            world,
+            light_group,
+            camera,
+            ctx,
+            ShaderType::PathTracing,
+            0.8,
+            2.2,
+        )
+    } else {
+        todo!()
+    };
     let img = renderer.render();
 
     //output image
