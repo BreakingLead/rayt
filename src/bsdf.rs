@@ -16,7 +16,7 @@ impl BSDF {
         color: Color, 
     ) -> HDR {
         let diffuse = kd * 1.0 / PI;
-        let v = wo.normalize() * (-1.0);
+        let v = wo.normalize();
         let n = normal;
         let l = wi.normalize();
         let h = (l + v).normalize();

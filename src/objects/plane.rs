@@ -1,8 +1,8 @@
-use serde::Deserialize;
-
 use crate::hit::{Front, HitRecord, Hittable};
 use crate::maths::{Color, Point3, Vec3};
 use crate::ray::Ray;
+
+use serde::Deserialize;
 
 #[derive(Deserialize, Debug)]
 pub struct SerializationPlane {
@@ -83,8 +83,12 @@ impl Hittable for Plane {
         //         which is equal to the normal form of a plane:
         //             Ax + By + Cz + D = 0
 
-        // use the plane equation ax + by + cz + d = 0, where (A, B, C) is the normal vector of the plane
+        // use the plane equation ax + by + cz + d = 0, where (a, b, c) is the normal vector of the plane
         let mut normal = self.edge_x.cross(&self.edge_y).normalize();
+        
+        if ray.direction * normal == 0.0 {
+            return None;
+        }
 
         // solve for d
         let d = normal * self.origin * (-1.0);
@@ -107,7 +111,7 @@ impl Hittable for Plane {
         let t = (-d - ray.origin * normal) / (ray.direction * normal);
 
         // identify whether k is in the acceptable range
-        if t < t_min || t > t_max {
+        if t <= t_min || t >= t_max {
             return None;
         }
 
@@ -153,5 +157,17 @@ impl Hittable for Plane {
             front_face: Front::Outward,
             t,
         });
+    }
+
+    fn get_color(&self) -> Color {
+        self.color
+    }
+
+    fn get_roughness(&self) -> f64 {
+        self.roughness
+    }
+
+    fn get_reflectivity(&self) -> f64 {
+        self.reflectivity
     }
 }
